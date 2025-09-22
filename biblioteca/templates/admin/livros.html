@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Gerenciamento de Autores</title>
+</head>
+<body>
+    <h1>Cadastro de Livros</h1>
+    <form method="POST" action="{{ url_for('routes.adicionar_livro') }}">
+        <label for="titulo">Título:</label>
+        <input type="text" id="titulo" name="titulo" required>
+        <label for="ano">Ano:</label>
+        <input type="number" id="ano" name="ano" required>
+        <select name="autor" id="autor">
+            {% for autor in autores %}
+                <option value="{{ autor.id }}">{{ autor.nome }}</option>
+            {% endfor %}
+        </select>
+    </form>
+
+    <a href="{{ url_for('routes.index') }}">Voltar para a página inicial</a>
+</body>
+</html>
