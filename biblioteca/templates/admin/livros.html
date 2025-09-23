@@ -114,7 +114,7 @@
             const data = {
                 titulo: formData.get('titulo'),
                 ano_publicacao: parseInt(formData.get('ano_publicacao'), 10),
-                autores_ids: Array.from(formData.getAll('autores')).map(id => parseInt(id, 10))
+                autores_ids: formData.getAll('autores')
             };
 
             try {

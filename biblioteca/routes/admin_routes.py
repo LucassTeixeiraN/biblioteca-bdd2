@@ -19,7 +19,7 @@ def adicionar_autor():
         novo_autor = Autor(nome=nome)
         db.session.add(novo_autor)
         db.session.commit()
-    return redirect(url_for('admin_bp.lista_autores'))
+    return redirect(url_for('admin_bp.renderiza_autores'))
 
 @admin_bp.route('/livros')
 def lista_livros():

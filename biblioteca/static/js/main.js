@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
         listaLivros.innerHTML = '';
         livros.forEach(livro => {
             const li = document.createElement('li');
-            li.textContent = `${livro.titulo} (${livro.ano_publicacao})`;
+            li.textContent = `${livro.titulo} (${livro.ano_publicacao}) - ${livro.autores.nome}`;
             listaLivros.appendChild(li);
         });
     }
