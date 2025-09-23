@@ -9,6 +9,8 @@ class Livro(db.Model):
     titulo = db.Column(db.String)
     ano_publicacao = db.Column(db.Integer)
     autores = relationship('Autor', secondary=livro_autor, back_populates='livros')
+    emprestimos = db.relationship('Emprestimo', back_populates='livro', lazy='dynamic')
+
 
     def __repr__(self):
         return f"<Livro(titulo='{self.titulo}')>"

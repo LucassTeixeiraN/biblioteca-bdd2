@@ -8,7 +8,7 @@ from models.livro import Livro
 admin_bp = Blueprint('admin_bp', __name__, url_prefix='/admin')
 
 @admin_bp.route('/autores')
-def lista_autores():
+def renderiza_autores():
     autores = Autor.query.all()
     return render_template('admin/autores.html', autores=autores)
 

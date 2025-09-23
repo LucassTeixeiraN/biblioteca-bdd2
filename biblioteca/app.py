@@ -4,6 +4,10 @@ from models import  Autor, Exemplar, Usuario, Aluno, Professor, Funcionario
 from core.database import db
 from routes.livro_routes import livro_bp
 from routes.admin_routes import admin_bp
+from routes.usuario_routes import usuario_bp
+from routes.emprestimo_routes import emprestimo_bp
+from routes.autores_route import autores_bp
+
 
 def create_app():
     app = Flask(__name__)
@@ -13,6 +17,9 @@ def create_app():
     db.init_app(app)
     app.register_blueprint(livro_bp)
     app.register_blueprint(admin_bp)
+    app.register_blueprint(usuario_bp)
+    app.register_blueprint(emprestimo_bp)
+    app.register_blueprint(autores_bp)
 
     return app
 

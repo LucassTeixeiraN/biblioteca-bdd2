@@ -3,7 +3,7 @@ from core.database import db
 from models.livro import Livro
 from models.autor import Autor
 
-livro_bp = Blueprint('routes', __name__)
+livro_bp = Blueprint('livro_bp', __name__)
 
 @livro_bp.route('/')
 def index():
@@ -37,7 +37,7 @@ def adicionar_livro():
         db.session.add(novo_livro)
         db.session.commit()
     
-    return redirect(url_for('routes.index'))
+    return redirect(url_for('livro_bp.index'))
 
 @livro_bp.route('/livro/<int:livro_id>')
 def detalhe_livro(livro_id):
