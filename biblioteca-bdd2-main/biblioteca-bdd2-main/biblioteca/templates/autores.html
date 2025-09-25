@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Gerenciamento de Autores{% endblock %}
+
+{% block content %}
+    <h1>Gerenciamento de Autores</h1>
+    
+    <div class="card my-4">
+        <div class="card-header">
+            <h3>Adicionar Novo Autor</h3>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('admin_bp.adicionar_autor') }}">
+                <div class="mb-3">
+                    <label for="nome" class="form-label">Nome do Autor:</label>
+                    <input type="text" id="nome" name="nome" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Adicionar Autor</button>
+            </form>
+        </div>
+    </div>
+    
+    <h2>Autores Cadastrados</h2>
+    <ul>
+    {% for autor in autores %}
+        <li>{{ autor.nome }}</li>
+    {% endfor %}
+    </ul>
+    
+    <div class="my-4">
+        <a href="{{ url_for('livro_bp.index') }}" class="btn btn-warning">Voltar para a página inicial</a>
+    </div>
+{% endblock %}

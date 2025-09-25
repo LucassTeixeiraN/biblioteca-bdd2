@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Início - Biblioteca Acadêmica{% endblock %}
+
+{% block content %}
+    <div class="content-section">
+        <h2>Livros Cadastrados</h2>
+        
+        <ul id="lista-livros">
+            <li>Carregando livros...</li>
+        </ul>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+{% endblock %}
