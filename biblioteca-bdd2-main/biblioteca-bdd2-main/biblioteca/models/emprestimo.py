@@ -21,12 +21,7 @@ class Emprestimo(db.Model):
     
     @property
     def esta_atrasado(self):
-        """
-        Verifica se o empréstimo está atrasado.
-        Condições:
-        1. Se o campo 'atrasado_manualmente' for True.
-        2. Se a data atual já passou da data prevista de devolução E o livro ainda não foi devolvido.
-        """
+
         if self.atrasado_manualmente:
             return True
         if self.data_devolucao is None and datetime.utcnow() > self.data_prevista_devolucao:

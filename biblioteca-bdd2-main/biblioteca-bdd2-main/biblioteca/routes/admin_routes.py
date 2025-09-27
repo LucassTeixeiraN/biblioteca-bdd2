@@ -4,19 +4,20 @@ from models.autor import Autor
 from models.exemplar import Exemplar
 from models.usuario import Aluno, Professor, Funcionario
 from models.livro import Livro
+from models.emprestimo import Emprestimo
 
 admin_bp = Blueprint('admin_bp', __name__, url_prefix='/admin')
 
 @admin_bp.route('/autores')
 def renderiza_autores():
     autores = Autor.query.all()
-    return render_template('admin/autores.html', autores=autores)
+    return render_template('autores.html', autores=autores)
 
 @admin_bp.route('/adicionar_autor', methods=['POST'])
 def adicionar_autor():
     nome = request.form.get('nome')
     if nome:
-        novo_autor = Autor(nome=nome)
+        novo_autor = Autor(nome=nome) #type: ignore
         db.session.add(novo_autor)
         db.session.commit()
     return redirect(url_for('admin_bp.renderiza_autores'))
@@ -24,7 +25,7 @@ def adicionar_autor():
 @admin_bp.route('/livros')
 def lista_livros():
     livros = Livro.query.all()
-    return render_template('admin/livros.html', livros=livros)
+    return render_template('livros.html', livros=livros)
 
 @admin_bp.route('/exemplares')
 def lista_exemplares():
@@ -36,7 +37,7 @@ def lista_usuarios():
     alunos = Aluno.query.all()
     professores = Professor.query.all()
     funcionarios = Funcionario.query.all()
-    return render_template('admin/usuarios.html', 
+    return render_template('usuarios.html', 
         alunos=alunos, 
         professores=professores, 
         funcionarios=funcionarios
@@ -49,13 +50,19 @@ def adicionar_usuario():
     tipo = request.form.get('tipo')
     
     if tipo == 'aluno':
-        novo_usuario = Aluno(nome=nome, email=email, matricula=request.form.get('matricula'))
+        novo_usuario = Aluno(nome=nome, email=email, matricula=request.form.get('matricula')) #type: ignore
     elif tipo == 'professor':
-        novo_usuario = Professor(nome=nome, email=email, departamento=request.form.get('departamento'))
+        novo_usuario = Professor(nome=nome, email=email, departamento=request.form.get('departamento')) #type: ignore
     elif tipo == 'funcionario':
-        novo_usuario = Funcionario(nome=nome, email=email, cargo=request.form.get('cargo'))
+        novo_usuario = Funcionario(nome=nome, email=email, cargo=request.form.get('cargo')) #type: ignore
     
     if novo_usuario:
         db.session.add(novo_usuario)
         db.session.commit()
     return redirect(url_for('admin_bp.lista_usuarios'))
+
+
+@admin_bp.route('/emprestimos')
+def renderizar_emprestimo():
+    emprestimos = Emprestimo.query.all()
+    return render_template('emprestimo.html', emprestimos=emprestimos)

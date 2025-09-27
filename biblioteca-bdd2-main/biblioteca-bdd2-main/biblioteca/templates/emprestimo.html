@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerir Empréstimos</title>
+    <style>
+        /* Estilos Gerais */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f4f7f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        h1, h2, h3 {
+            color: #2c3e50;
+            margin-top: 0;
+        }
+
+        /* Estilos do Formulário */
+        .card {
+            border: 1px solid #e1e8ed;
+            border-radius: 8px;
+            margin: 25px 0;
+            overflow: hidden; /* Garante que os cantos arredondados sejam aplicados */
+        }
+
+        .card-header {
+            background-color: #f9fafb;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e1e8ed;
+        }
+
+        .card-header h3 {
+            margin: 0;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        select, input[type="text"], input[type="number"], input[type="email"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 1em;
+        }
+
+        .form-text {
+            font-size: 0.85em;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        /* Botões */
+        .btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary { background-color: #007bff; color: white; }
+        .btn-success { background-color: #28a745; color: white; }
+        .btn-secondary { background-color: #6c757d; color: white; }
+        .btn-sm { padding: 5px 10px; font-size: 0.875em; }
+
+        /* Tabela */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        thead th {
+            background-color: #f2f2f2;
+        }
+
+        tbody tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        /* Classes de Status */
+        .status-devolvido { color: #6c757d; }
+        .status-atrasado { color: #dc3545; font-weight: bold; }
+        .status-em-dia { color: #28a745; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Gerir Empréstimos</h1>
+
+        <!-- Formulário para Novo Empréstimo -->
+        <div class="card">
+            <div class="card-header"><h3>Novo Empréstimo</h3></div>
+            <div class="card-body">
+                <form id="form-add-emprestimo">
+                    <div class="form-group">
+                        <label for="usuario_id">Usuário</label>
+                        <select id="usuario_id" name="usuario_id" required>
+                            <option value="">Carregando usuários...</option>
+                        </select>
+                        <div class="form-text">Apenas usuários aptos a realizar empréstimos são exibidos.</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="livro_id">Livro</label>
+                        <select id="livro_id" name="livro_id" required>
+                             <option value="">Carregando livros...</option>
+                        </select>
+                         <div class="form-text">Apenas livros disponíveis para empréstimo são exibidos.</div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Realizar Empréstimo</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Tabela de Empréstimos -->
+        <h2>Histórico de Empréstimos</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Livro</th>
+                    <th>Usuário</th>
+                    <th>Data Empréstimo</th>
+                    <th>Devolução Prevista</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="lista-emprestimos">
+                <!-- Empréstimos serão carregados aqui via JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Função para popular os selects de usuários e livros
+        async function popularSelects() {
+            try {
+                // Popula usuários
+                const usuariosResponse = await fetch('/api/usuarios');
+                const usuarios = await usuariosResponse.json();
+                const selectUsuario = document.getElementById('usuario_id');
+                selectUsuario.innerHTML = '<option value="">Selecione um usuário</option>';
+                usuarios.forEach(u => {
+                    if (u.pode_emprestar) { // Regra de negócio: só mostra usuários que podem pegar livros
+                        selectUsuario.innerHTML += `<option value="${u.id}">${u.nome} (${u.tipo})</option>`;
+                    }
+                });
+
+                // Popula livros (assumindo que você tem um endpoint /api/livros)
+                const livrosResponse = await fetch('/api/livros');
+                const livros = await livrosResponse.json();
+                const selectLivro = document.getElementById('livro_id');
+                selectLivro.innerHTML = '<option value="">Selecione um livro</option>';
+                livros.forEach(l => {
+                    const isDisponivel = !l.emprestimos.some(e => e.data_devolucao === null);
+                    if (isDisponivel) { // Regra de negócio: só mostra livros disponíveis
+                        selectLivro.innerHTML += `<option value="${l.id}">${l.titulo}</option>`;
+                    }
+                });
+            } catch (error) {
+                console.error("Erro ao popular os formulários:", error);
+                alert("Não foi possível carregar os dados para o formulário. Verifique a consola.");
+            }
+        }
+
+        // Função para carregar os empréstimos na tabela
+        async function carregarEmprestimos() {
+            try {
+                const res = await fetch('/api/emprestimos');
+                const emprestimos = await res.json();
+                
+                const tbody = document.getElementById('lista-emprestimos');
+                tbody.innerHTML = '';
+                emprestimos.forEach(e => {
+                    const tr = document.createElement('tr');
+                    
+                    let statusClass, statusText;
+                    if (e.data_devolucao) {
+                        statusClass = 'status-devolvido';
+                        statusText = 'Devolvido';
+                    } else if (e.esta_atrasado) {
+                        statusClass = 'status-atrasado';
+                        statusText = 'Atrasado';
+                    } else {
+                        statusClass = 'status-em-dia';
+                        statusText = 'Em dia';
+                    }
+                    
+                    tr.innerHTML = `
+                        <td>${e.livro.titulo}</td>
+                        <td>${e.usuario.nome}</td>
+                        <td>${new Date(e.data_emprestimo).toLocaleDateString('pt-BR')}</td>
+                        <td>${new Date(e.data_prevista_devolucao).toLocaleDateString('pt-BR')}</td>
+                        <td class="${statusClass}">${statusText}</td>
+                        <td>
+                            ${!e.data_devolucao ? `<button class="btn btn-sm btn-success" onclick="devolver(${e.id})">Devolver</button>` : ''}
+                            <button class="btn btn-sm btn-secondary" onclick="alternarAtraso(${e.id})">
+                                ${e.atrasado_manualmente ? 'Desfazer Atraso' : 'Forçar Atraso'}
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                 console.error("Erro ao carregar empréstimos:", error);
+                 document.getElementById('lista-emprestimos').innerHTML = '<tr><td colspan="6">Não foi possível carregar os empréstimos.</td></tr>';
+            }
+        }
+
+        // Submissão do formulário de novo empréstimo
+        document.getElementById('form-add-emprestimo').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const data = {
+                usuario_id: parseInt(this.usuario_id.value, 10),
+                livro_id: parseInt(this.livro_id.value, 10)
+            };
+
+            try {
+                const res = await fetch('/api/emprestimos', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                if (!res.ok) {
+                    const err = await res.json();
+                    throw new Error(err.erro || 'Erro desconhecido');
+                }
+                
+                alert('Empréstimo realizado com sucesso!');
+                location.reload();
+
+            } catch (err) {
+                 alert(`Erro ao realizar empréstimo: ${err.message}`);
+            }
+        });
+
+        // Funções de ação (Devolver, Forçar Atraso)
+        async function apiPutAction(emprestimoId, acao) {
+            try {
+                const res = await fetch(`/api/emprestimos/${emprestimoId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ acao: acao })
+                });
+
+                if (!res.ok) {
+                    const err = await res.json();
+                    throw new Error(err.erro || 'Erro desconhecido');
+                }
+
+                carregarEmprestimos(); // Recarrega apenas a tabela para uma melhor experiência
+                
+            } catch(err) {
+                alert(`Erro ao executar ação: ${err.message}`);
+            }
+        }
+        
+        function devolver(emprestimoId) {
+            if (confirm('Confirmar devolução deste livro?')) {
+                apiPutAction(emprestimoId, 'devolver');
+            }
+        }
+
+        function alternarAtraso(emprestimoId) {
+            apiPutAction(emprestimoId, 'alternar_atraso_manual');
+        }
+
+        // Inicialização da página
+        document.addEventListener('DOMContentLoaded', () => {
+            popularSelects();
+            carregarEmprestimos();
+        });
+    </script>
+</body>
+</html>
+

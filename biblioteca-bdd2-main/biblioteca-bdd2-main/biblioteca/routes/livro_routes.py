@@ -32,9 +32,9 @@ def adicionar_livro():
     autores = Autor.query.filter(Autor.id.in_(autores_ids)).all()
 
     novo_livro = Livro(
-        titulo=data['titulo'],
-        ano_publicacao=data['ano_publicacao'],
-        autores=autores
+        titulo=data['titulo'], #type: ignore
+        ano_publicacao=data['ano_publicacao'], #type: ignore
+        autores=autores #type: ignore
     )
     db.session.add(novo_livro)
     db.session.commit()

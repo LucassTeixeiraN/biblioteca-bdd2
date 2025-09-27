@@ -13,7 +13,7 @@ emprestimo_bp = Blueprint('emprestimo_bp', __name__)
 @emprestimo_bp.route('/emprestimos', methods=['GET', 'POST'])
 def emprestimos_collection():
     """- GET: Retorna uma lista de empréstimos, com filtros opcionais.
-       - POST: Cria um novo empréstimo."""
+    - POST: Cria um novo empréstimo."""
     if request.method == 'POST':
         data = request.get_json()
         if not data or not all(k in data for k in ['usuario_id', 'livro_id']):
@@ -26,7 +26,7 @@ def emprestimos_collection():
         if Emprestimo.query.filter_by(livro_id=livro.id, data_devolucao=None).first():
             return jsonify({'erro': 'Este livro já está emprestado.'}), 409
 
-        novo_emprestimo = Emprestimo(usuario_id=usuario.id, livro_id=livro.id)
+        novo_emprestimo = Emprestimo(usuario_id=usuario.id, livro_id=livro.id) #type: ignore
         # Permite definir uma data de devolução prevista diferente no POST
         if 'data_prevista_devolucao' in data:
             novo_emprestimo.data_prevista_devolucao = datetime.fromisoformat(data['data_prevista_devolucao'])
