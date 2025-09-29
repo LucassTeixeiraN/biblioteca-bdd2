@@ -70,7 +70,9 @@ pip install -r requirements.txt
 
 Com o ambiente virtual ainda ativo e a base de dados criada, inicie o servidor de desenvolvimento do Flask:
 
+```
 flask run
+```
 
 A aplicação estará agora a ser executada! Abra o seu navegador e acesse a:
 http://127.0.0.1:5000/
