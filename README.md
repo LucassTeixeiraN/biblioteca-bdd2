@@ -71,6 +71,10 @@ pip install -r requirements.txt
 Com o ambiente virtual ainda ativo e a base de dados criada, inicie o servidor de desenvolvimento do Flask:
 
 ```
+#Se for a primeira vez rodando o sistema, utilize: 
+python app.py
+
+#Se não, utilize
 flask run
 ```
 
