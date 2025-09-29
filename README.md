@@ -1,4 +1,4 @@
-# Sistema de Gestão de Biblioteca
+# Sistema de Gestão de Biblioteca 📚
 Bem-vindo ao Sistema de Gestão de Biblioteca! Esta é uma aplicação web desenvolvida em Flask para administrar os recursos de uma biblioteca acadêmica, incluindo o cadastro de livros, autores, usuários (leitores) e o controle de empréstimos.
 
 ## ✨ Funcionalidades Principais
