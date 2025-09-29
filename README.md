@@ -1,4 +1,4 @@
-# Sistema de Gestão de Biblioteca
+# Sistema de Gestão de Biblioteca 📚
 Bem-vindo ao Sistema de Gestão de Biblioteca! Esta é uma aplicação web desenvolvida em Flask para administrar os recursos de uma biblioteca acadêmica, incluindo o cadastro de livros, autores, usuários (leitores) e o controle de empréstimos.
 
 ## ✨ Funcionalidades Principais
@@ -71,12 +71,12 @@ pip install -r requirements.txt
 Com o ambiente virtual ainda ativo e a base de dados criada, inicie o servidor de desenvolvimento do Flask:
 
 ```
-#Se for a primeira vez rodando o sistema, utilize: 
+# Se for a primeira vez rodando o sistema, utilize: 
 python app.py
 
-#Se não, utilize
+# Se não, utilize
 flask run
 ```
 
-A aplicação estará agora a ser executada! Abra o seu navegador e acesse a:
+A aplicação agora será executada! Abra o seu navegador e acesse:
 http://127.0.0.1:5000/
