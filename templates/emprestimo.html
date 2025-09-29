@@ -1,20 +1,128 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gerir Empréstimos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+
+        h1, h2, h3 {
+            color: #2c3e50;
+            margin-top: 0;
+        }
+
+        /* Estilos do Formulário */
+        .card {
+            border: 1px solid #e1e8ed;
+            border-radius: 8px;
+            margin: 25px 0;
+            overflow: hidden; /* Garante que os cantos arredondados sejam aplicados */
+        }
+
+        .card-header {
+            background-color: #f9fafb;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e1e8ed;
+        }
+
+        .card-header h3 {
+            margin: 0;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        select, input[type="text"], input[type="number"], input[type="email"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 1em;
+        }
+
+        .form-text {
+            font-size: 0.85em;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        /* Botões */
+        .btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary { background-color: #007bff; color: white; }
+        .btn-success { background-color: #28a745; color: white; }
+        .btn-secondary { background-color: #6c757d; color: white; }
+        .btn-sm { padding: 5px 10px; font-size: 0.875em; }
+
+        /* Tabela */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        thead th {
+            background-color: #f2f2f2;
+        }
+
+        tbody tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        /* Classes de Status */
+        .status-devolvido { color: #6c757d; }
+        .status-atrasado { color: #dc3545; font-weight: bold; }
+        .status-em-dia { color: #28a745; }
+    </style>
 </head>
 <body>
+    <header class="navbar">
+        <div class="container navbar-content">
+            <a href="{{ url_for('livro_bp.index') }}" class="logo">Biblioteca</a> 
+            <nav class="nav-links">
+                <a href="{{ url_for('livro_bp.index') }}">Início</a>
+                <a href="{{ url_for('admin_bp.lista_livros') }}">Gerir Livros</a>
+                <a href="{{ url_for('admin_bp.renderiza_autores') }}">Gerir Autores</a>
+                <a href="{{ url_for('admin_bp.lista_usuarios') }}">Gerir Usuários</a>
+                <a href="{{ url_for('admin_bp.renderizar_emprestimo') }}">Gerir Emprestimos</a>
+            </nav>
+        </div>
+    </header>
     <div class="container">
         <h1>Gerir Empréstimos</h1>
 
         <!-- Formulário para Novo Empréstimo -->
-        <div class="form-card">
-            <div class="form-header">
-                <h3>Novo Empréstimo</h3>
-            </div>
-            <div class="form-body">
+        <div class="card">
+            <div class="card-header"><h3>Novo Empréstimo</h3></div>
+            <div class="card-body">
                 <form id="form-add-emprestimo">
                     <div class="form-group">
                         <label for="usuario_id">Usuário</label>
@@ -54,7 +162,6 @@
         </table>
     </div>
 
-    <a href="{{ url_for('livro_bp.index') }}">Voltar para a página inicial</a>
     <script>
         // Função para popular os selects de usuários e livros
         async function popularSelects() {
@@ -65,19 +172,18 @@
                 const selectUsuario = document.getElementById('usuario_id');
                 selectUsuario.innerHTML = '<option value="">Selecione um usuário</option>';
                 usuarios.forEach(u => {
-                    if (u.pode_emprestar) { 
+                    if (u.pode_emprestar) { // Regra de negócio: só mostra usuários que podem pegar livros
                         selectUsuario.innerHTML += `<option value="${u.id}">${u.nome} (${u.tipo})</option>`;
                     }
                 });
 
-                // Popula livros
-                const livrosResponse = await fetch('/api/livros');
+                const livrosResponse = await fetch('/livros');
                 const livros = await livrosResponse.json();
                 const selectLivro = document.getElementById('livro_id');
                 selectLivro.innerHTML = '<option value="">Selecione um livro</option>';
                 livros.forEach(l => {
                     const isDisponivel = !l.emprestimos.some(e => e.data_devolucao === null);
-                    if (isDisponivel) { 
+                    if (isDisponivel) { // Regra de negócio: só mostra livros disponíveis
                         selectLivro.innerHTML += `<option value="${l.id}">${l.titulo}</option>`;
                     }
                 });
@@ -113,9 +219,9 @@
                     tr.innerHTML = `
                         <td>${e.livro.titulo}</td>
                         <td>${e.usuario.nome}</td>
-                        <td>${new Date(e.data_emprestimo).toLocaleDateString()}</td>
-                        <td>${new Date(e.data_prevista_devolucao).toLocaleDateString()}</td>
-                        <td><span class="status ${statusClass}">${statusText}</span></td>
+                        <td>${new Date(e.data_emprestimo).toLocaleDateString('pt-BR')}</td>
+                        <td>${new Date(e.data_prevista_devolucao).toLocaleDateString('pt-BR')}</td>
+                        <td class="${statusClass}">${statusText}</td>
                         <td>
                             ${!e.data_devolucao ? `<button class="btn btn-sm btn-success" onclick="devolver(${e.id})">Devolver</button>` : ''}
                             <button class="btn btn-sm btn-secondary" onclick="alternarAtraso(${e.id})">
@@ -173,8 +279,8 @@
                     throw new Error(err.erro || 'Erro desconhecido');
                 }
 
-                carregarEmprestimos(); 
                 popularSelects();
+                carregarEmprestimos();
                 
             } catch(err) {
                 alert(`Erro ao executar ação: ${err.message}`);
@@ -184,11 +290,13 @@
         function devolver(emprestimoId) {
             if (confirm('Confirmar devolução deste livro?')) {
                 apiPutAction(emprestimoId, 'devolver');
+                popularSelects();
             }
         }
 
         function alternarAtraso(emprestimoId) {
             apiPutAction(emprestimoId, 'alternar_atraso_manual');
+            popularSelects();
         }
 
         // Inicialização da página
@@ -199,3 +307,4 @@
     </script>
 </body>
 </html>
+

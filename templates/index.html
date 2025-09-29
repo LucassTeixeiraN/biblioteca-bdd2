@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Início - Biblioteca Acadêmica{% endblock %}
+
+{% block content %}
+<div class="content-section">
+        <h2>Livros Cadastrados</h2>
+
+        <!-- Seção de Filtros -->
+        <div class="filter-section card my-4">
+            <div class="card-header">
+                <h3>Filtrar Livros</h3>
+            </div>
+            <div class="card-body">
+                <form id="filter-form" class="row g-3">
+                    <div class="col-md-5">
+                        <label for="filtro-autor" class="form-label">Filtrar por Autor:</label>
+                        <select id="filtro-autor" class="form-select">
+                            <option value="">Todos os Autores</option>
+                            <!-- Autores serão populados via JS -->
+                        </select>
+                    </div>
+                    <div class="col-md-5">
+                        <label for="filtro-ano" class="form-label">Filtrar por Ano de Publicação:</label>
+                        <input type="number" id="filtro-ano" class="form-control" placeholder="Ex: 2023">
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="button" id="limpar-filtros" class="btn btn-secondary w-100">Limpar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Lista de Livros -->
+        <ul id="lista-livros" class="list-group">
+            <li class="list-group-item">Carregando livros...</li>
+        </ul>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+{% endblock %}

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Biblioteca Acadêmica{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header class="navbar">
+        <div class="container navbar-content">
+            <a href="{{ url_for('livro_bp.index') }}" class="logo">Biblioteca</a> 
+            <nav class="nav-links">
+                <a href="{{ url_for('livro_bp.index') }}">Início</a>
+                <a href="{{ url_for('admin_bp.lista_livros') }}">Gerir Livros</a>
+                <a href="{{ url_for('admin_bp.renderiza_autores') }}">Gerir Autores</a>
+                <a href="{{ url_for('admin_bp.lista_usuarios') }}">Gerir Usuários</a>
+                <a href="{{ url_for('admin_bp.renderizar_emprestimo') }}">Gerir Emprestimos</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container content-main">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Biblioteca Flask</p>
+        </div>
+    </footer>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>

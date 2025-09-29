@@ -1,6 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
-from flask_sqlalchemy import SQLAlchemy
-from models import  Autor, Exemplar, Usuario, Aluno, Professor, Funcionario
+from flask import Flask
 from core.database import db
 from routes.livro_routes import livro_bp
 from routes.admin_routes import admin_bp
