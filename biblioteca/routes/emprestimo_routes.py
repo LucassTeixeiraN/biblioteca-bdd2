@@ -26,7 +26,7 @@ def emprestimos_collection():
         if Emprestimo.query.filter_by(livro_id=livro.id, data_devolucao=None).first():
             return jsonify({'erro': 'Este livro já está emprestado.'}), 409
 
-        novo_emprestimo = Emprestimo(usuario_id=usuario.id, livro_id=livro.id)
+        novo_emprestimo = Emprestimo(usuario_id=usuario.id, livro_id=livro.id) #type:ignore
         # Permite definir uma data de devolução prevista diferente no POST
         if 'data_prevista_devolucao' in data:
             novo_emprestimo.data_prevista_devolucao = datetime.fromisoformat(data['data_prevista_devolucao'])
@@ -44,6 +44,7 @@ def emprestimo_resource(emprestimo_id):
     """- GET: Retorna um empréstimo específico.
        - PUT: Atualiza um empréstimo (devolver, forçar atraso)."""
     emprestimo = Emprestimo.query.get_or_404(emprestimo_id)
+    print(emprestimo)
 
     if request.method == 'PUT':
         data = request.get_json()
@@ -52,7 +53,7 @@ def emprestimo_resource(emprestimo_id):
         # Ação: Devolver livro
         if data.get('acao') == 'devolver':
             if not emprestimo.data_devolucao:
-                emprestimo.data_devolucao = datetime.utcnow()
+                emprestimo.data_devolucao = datetime.now()
         
         # Ação: Alternar estado de atraso manual
         if data.get('acao') == 'alternar_atraso_manual':

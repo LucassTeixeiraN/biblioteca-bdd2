@@ -16,7 +16,7 @@ def renderiza_autores():
 def adicionar_autor():
     nome = request.form.get('nome')
     if nome:
-        novo_autor = Autor(nome=nome)
+        novo_autor = Autor(nome=nome) #type:ignore
         db.session.add(novo_autor)
         db.session.commit()
     return redirect(url_for('admin_bp.renderiza_autores'))
@@ -49,13 +49,18 @@ def adicionar_usuario():
     tipo = request.form.get('tipo')
     
     if tipo == 'aluno':
-        novo_usuario = Aluno(nome=nome, email=email, matricula=request.form.get('matricula'))
+        novo_usuario = Aluno(nome=nome, email=email, matricula=request.form.get('matricula')) #type: ignore
     elif tipo == 'professor':
-        novo_usuario = Professor(nome=nome, email=email, departamento=request.form.get('departamento'))
+        novo_usuario = Professor(nome=nome, email=email, departamento=request.form.get('departamento')) #type: ignore
     elif tipo == 'funcionario':
-        novo_usuario = Funcionario(nome=nome, email=email, cargo=request.form.get('cargo'))
+        novo_usuario = Funcionario(nome=nome, email=email, cargo=request.form.get('cargo')) #type: ignore
     
     if novo_usuario:
         db.session.add(novo_usuario)
         db.session.commit()
     return redirect(url_for('admin_bp.lista_usuarios'))
+
+@admin_bp.route('/emprestimos', methods=['GET'])
+def gerenciar_emprestimos():
+    """Renderiza a página de gestão de empréstimos."""
+    return render_template('admin/emprestimos.html')
