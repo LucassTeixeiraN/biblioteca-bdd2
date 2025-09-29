@@ -10,7 +10,8 @@
             <h3>Adicionar Novo Autor</h3>
         </div>
         <div class="card-body">
-            <form method="POST" action="{{ url_for('admin_bp.adicionar_autor') }}">
+            <!-- O formulário agora usa JavaScript para enviar os dados -->
+            <form id="form-add-autor">
                 <div class="mb-3">
                     <label for="nome" class="form-label">Nome do Autor:</label>
                     <input type="text" id="nome" name="nome" class="form-control" required>
@@ -21,13 +22,102 @@
     </div>
     
     <h2>Autores Cadastrados</h2>
-    <ul>
-    {% for autor in autores %}
-        <li>{{ autor.nome }}</li>
-    {% endfor %}
-    </ul>
+    <!-- Tabela para uma melhor estrutura visual -->
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Nome do Autor</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody id="lista-autores">
+            <!-- Autores serão carregados aqui via JavaScript -->
+        </tbody>
+    </table>
     
-    <div class="my-4">
-        <a href="{{ url_for('livro_bp.index') }}" class="btn btn-warning">Voltar para a página inicial</a>
-    </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Função para carregar os autores na tabela
+    async function carregarAutores() {
+        try {
+            const response = await fetch('/autores');
+            if (!response.ok) throw new Error('Falha ao carregar autores');
+            
+            const autores = await response.json();
+            const tbody = document.getElementById('lista-autores');
+            tbody.innerHTML = ''; // Limpa a lista antes de recarregar
+            
+            autores.forEach(autor => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${autor.nome}</td>
+                    <td>
+                        <button class="btn btn-sm btn-danger" onclick="deleteAutor(${autor.id})">
+                            Excluir
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        } catch (error) {
+            console.error('Erro:', error);
+            document.getElementById('lista-autores').innerHTML = '<tr><td colspan="2">Não foi possível carregar os autores.</td></tr>';
+        }
+    }
+
+    // Função para deletar um autor
+    async function deleteAutor(autorId) {
+        if (!confirm('Tem a certeza que deseja excluir este autor? Esta ação não pode ser desfeita.')) {
+            return;
+        }
+        try {
+            const response = await fetch(`/autores/${autorId}`, {
+                method: 'DELETE'
+            });
+            
+            const data = await response.json();
+
+            if (!response.ok) {
+                // Se a resposta não for OK, lança um erro com a mensagem da API
+                throw new Error(data.erro || 'Erro desconhecido ao excluir autor.');
+            }
+            
+            alert(data.mensagem);
+            carregarAutores(); // Recarrega a lista para refletir a exclusão
+        } catch (error) {
+            alert(`Erro: ${error.message}`);
+        }
+    }
+
+    // Event listener para o formulário de adição
+    document.getElementById('form-add-autor').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const nomeAutor = document.getElementById('nome').value;
+
+        try {
+            const response = await fetch('/autores', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nome: nomeAutor })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.erro || 'Erro desconhecido ao adicionar autor.');
+            }
+
+            alert('Autor adicionado com sucesso!');
+            this.reset(); // Limpa o campo do formulário
+            carregarAutores(); // Recarrega a lista
+        } catch (error) {
+            alert(`Erro: ${error.message}`);
+        }
+    });
+
+    // Inicialização: Carrega os autores quando a página é aberta
+    document.addEventListener('DOMContentLoaded', carregarAutores);
+</script>
 {% endblock %}

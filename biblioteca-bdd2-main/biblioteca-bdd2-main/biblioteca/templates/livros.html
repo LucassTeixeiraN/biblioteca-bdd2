@@ -46,17 +46,121 @@
 
         </tbody>
     </table>
+        <div id="editLivroModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close">&times;</span>
+                <h3>Editar Livro</h3>
+            </div>
+            <div class="modal-body">
+                <form id="form-edit-livro">
+                    <input type="hidden" id="edit-id" name="id">
+                    <div class="form-group">
+                        <label for="edit-titulo">Título</label>
+                        <input type="text" id="edit-titulo" name="titulo" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-ano">Ano de Publicação</label>
+                        <input type="number" id="edit-ano" name="ano_publicacao" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-autores">Autor(es)</label>
+                        <select id="edit-autores" name="autores" class="form-select" multiple required></select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                </form>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 {% block scripts %}
     <script>
+        const editModal = document.getElementById('editLivroModal');
+        const spanClose = editModal.querySelector('.close');
+        spanClose.onclick = () => editModal.style.display = "none";
+        window.onclick = (event) => {
+            if (event.target == editModal) {
+                editModal.style.display = "none";
+            }
+        }
+        async function openEditModal(livroId) {
+            try {
+                const response = await fetch(`/livros/${livroId}`);
+                const livro = await response.json();
+
+                document.getElementById('edit-id').value = livro.id;
+                document.getElementById('edit-titulo').value = livro.titulo;
+                document.getElementById('edit-ano').value = livro.ano_publicacao;
+                
+                const selectedAutorIds = livro.autores.map(a => a.id);
+                await carregarAutores(document.getElementById('edit-autores'), selectedAutorIds);
+
+                editModal.style.display = "block";
+            } catch (error) {
+                alert('Não foi possível carregar os dados do livro para edição.');
+                console.error(error);
+            }
+        }
+
+        async function carregarAutores(selectElement, selectedIds = []) {
+            try {
+                const response = await fetch('/autores');
+                if (!response.ok) throw new Error('Falha ao carregar autores');
+                
+                const autores = await response.json();
+                selectElement.innerHTML = '';
+                autores.forEach(autor => {
+                    const option = document.createElement('option');
+                    option.value = autor.id;
+                    option.textContent = autor.nome;
+                    if (selectedIds.includes(autor.id)) {
+                        option.selected = true;
+                    }
+                    selectElement.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Erro ao popular autores:', error);
+                selectElement.innerHTML = '<option value="">Não foi possível carregar</option>';
+            }
+        }
+
+        document.getElementById('form-edit-livro').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const id = this.id.value;
+            const selectedOptions = document.getElementById('edit-autores').selectedOptions;
+            const autores_ids = Array.from(selectedOptions).map(option => parseInt(option.value));
+            
+            const data = {
+                titulo: this.titulo.value,
+                ano_publicacao: parseInt(this.ano_publicacao.value),
+                autores_ids: autores_ids
+            };
+            
+            try {
+                const response = await fetch(`/livros/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                if (!response.ok) {
+                    const err = await response.json();
+                    throw new Error(err.erro || 'Erro ao atualizar livro.');
+                }
+                alert('Livro atualizado com sucesso!');
+                editModal.style.display = "none";
+                carregarLivros(); // Recarrega a lista para mostrar as alterações
+            } catch (error) {
+                alert(`Erro: ${error.message}`);
+            }
+        });
+
         async function popularSelectAutores() {
             try {
                 const response = await fetch('/autores'); 
                 if (!response.ok) throw new Error('Falha ao carregar autores');
                 
                 const autores = await response.json();
-                console.log(autores);
                 
                 const selectAutor = document.getElementById('autores');
                 selectAutor.innerHTML = ''; 
@@ -72,13 +176,12 @@
         // Função para carregar os livros na tabela
         async function carregarLivros() {
             try {
-                const response = await fetch('/api/livros'); 
+                const response = await fetch('/livros'); 
                 if (!response.ok) throw new Error('Falha ao carregar livros');
 
                 const livros = await response.json();
                 const tbody = document.getElementById('lista-livros');
                 tbody.innerHTML = '';
-                console.log(livros);
                 
                 livros.forEach(livro => {
                     const tr = document.createElement('tr');
@@ -91,7 +194,7 @@
                         <td>${autoresNomes}</td>
                         <td>${isDisponivel ? 'Sim' : 'Não'}</td>
                         <td>
-                            <button class="btn btn-sm btn-warning" ${!isDisponivel ? 'disabled' : ''}>Editar</button>
+                            <button class="btn btn-sm btn-warning" onclick="openEditModal(${livro.id})" ${!isDisponivel ? 'disabled' : ''}>Editar</button>
                             <button class="btn btn-sm btn-danger" onclick="deleteLivro(${livro.id})" ${!isDisponivel ? 'disabled' : ''}>Excluir</button>
                         </td>
                     `;
@@ -114,7 +217,7 @@
             };
 
             try {
-                const response = await fetch('/adicionar_livro', { // Supondo endpoint de criação
+                const response = await fetch('/livros', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
@@ -136,7 +239,7 @@
                 return;
             }
             try {
-                const response = await fetch(`/api/livros/${livroId}`, { // Supondo endpoint de deleção
+                const response = await fetch(`/livros/${livroId}`, { // Supondo endpoint de deleção
                     method: 'DELETE'
                 });
                 if (!response.ok) {
