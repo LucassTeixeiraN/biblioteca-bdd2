@@ -40,6 +40,7 @@ Abra o seu terminal ou git bash e clone o projeto para o seu computador.
 
 ```git
 git clone https://github.com/LucassTeixeiraN/biblioteca-bdd2.git
+cd biblioteca-bdd2
 ```
 
 **b. Crie e Ative um Ambiente Virtual (venv):**
