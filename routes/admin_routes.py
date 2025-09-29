@@ -6,6 +6,11 @@ from models.emprestimo import Emprestimo
 
 admin_bp = Blueprint('admin_bp', __name__, url_prefix='/admin')
 
+@admin_bp.route('/buscarLivros')
+def renderiza_filtros():
+    livros = Livro.query.all()
+    return render_template('index.html', livros=livros)
+
 @admin_bp.route('/autores')
 def renderiza_autores():
     autores = Autor.query.all()

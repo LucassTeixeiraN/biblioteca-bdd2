@@ -1,4 +1,4 @@
-from flask import render_template, request, Blueprint, jsonify
+from flask import render_template, request, Blueprint, jsonify, redirect, url_for
 from core.database import db
 from sqlalchemy import text
 from models.livro import Livro
@@ -53,8 +53,8 @@ def _filtrar_livros_query(params):
 @livro_bp.route('/')
 def index():
     """Exibe a página inicial com a lista de livros."""
-    livros = Livro.query.all()
-    return render_template('index.html', livros=livros)
+    return redirect(url_for('admin_bp.renderizar_emprestimo')) 
+
 
 @livro_bp.route('/livros', methods=['GET', 'POST'])
 def livros_collection():
