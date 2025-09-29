@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
             li.className = 'list-group-item';
             const autoresNomes = livro.autores.map(a => a.nome).join(', ');
             li.innerHTML = `
-                <h5>${livro.titulo} (${livro.ano_publicacao})</h5>
+                <h4>Título: ${livro.titulo} (${livro.ano_publicacao})</h4>
                 <small>Autores: ${autoresNomes}</small>
             `;
             listaLivrosUl.appendChild(li);
